@@ -4,6 +4,8 @@ It's a CALDAV calendar server for companies that use LDAP. Each user gets his ow
 on the LDAP group the user is a member of, gets access to the group calendars associated with that calendar.
 The server works on mono and .NET.
 
+Written using Oxygene for .NET
+
 # Getting started
 
 * Get and install RemObjects Data Abstract.
@@ -38,6 +40,6 @@ LdapGroup "test". Groups that are nested in a sub element in ldap will have name
 cn=test,ou=employees,ou=groups,dc=yourcompany,dc=com  will be employees.test in LdapGroup.
 Groups will show right away to all users that have access to that group.
 
-Apple iCalendar on the iPod, iPad, iPhone and MacOS require just one http://yourhost:port/dav/ as an url where it adds all the 
-calendars for you. Thunderbird does not detect a root folder and needs a seperate "CALDAV" calendar for each calendar to 
+Apple iCal on the iPod, iPad, iPhone and Mac OS X require just the simple http://yourhost:port/dav/ as an url and will detect adds all the 
+all calendars for you. Thunderbird does not detect a root folder and needs a seperate "CALDAV" calendar for each calendar to 
 http://yourhost:port/dav/calendarname/
