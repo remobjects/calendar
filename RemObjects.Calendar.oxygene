@@ -55,15 +55,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="antlr.runtime">
-      <HintPath>R:\test\RemObjects.Calendar\Lib\antlr.runtime.dll</HintPath>
+      <HintPath>Lib\antlr.runtime.dll</HintPath>
     </Reference>
     <Reference Include="DDay.iCal">
-      <HintPath>R:\test\RemObjects.Calendar\Lib\DDay.iCal.dll</HintPath>
+      <HintPath>Lib\DDay.iCal.dll</HintPath>
+    </Reference>
+    <Reference Include="Kayak">
+      <HintPath>Lib\Kayak.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="NLog">
-      <HintPath>C:\Program Files (x86)\NLog\Mono 2.x\NLog.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>Lib\NLog.dll</HintPath>
     </Reference>
     <Reference Include="RemObjects.DataAbstract">
       <Private>True</Private>
@@ -131,9 +133,10 @@
     <EmbeddedResource Include="Calendar.daSchema">
       <SubType>Content</SubType>
     </EmbeddedResource>
-    <Content Include="app.config">
+    <None Include="app.config">
       <SubType>Content</SubType>
-    </Content>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <Content Include="NLog.config">
       <SubType>Content</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -160,19 +163,15 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="kayak\Kayak\Kayak.csproj">
-      <Name>Kayak</Name>
-      <Project>{79ddd0ce-6f79-4212-a972-8618ad6e405f}</Project>
-      <Private>True</Private>
-      <HintPath>kayak\Kayak\bin\Debug\Kayak.dll</HintPath>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Oxygene\RemObjects.Oxygene.targets" />
   <PropertyGroup>
     <PreBuildEvent />
     <PostBuildEvent />
     <PreBuildEvent />
+    <PreBuildEvent />
+    <PreBuildEvent />
+    <PostBuildEvent />
+    <PostBuildEvent />
     <PostBuildEvent />
   </PropertyGroup>
 </Project>

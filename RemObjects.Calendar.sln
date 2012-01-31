@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "RemObjects.Calendar", "RemObjects.Calendar.oxygene", "{FB53968C-A8ED-4345-A74F-C7BD09675284}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak", "kayak\Kayak\Kayak.csproj", "{79DDD0CE-6F79-4212-A972-8618AD6E405F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,14 +19,6 @@ Global
 		{FB53968C-A8ED-4345-A74F-C7BD09675284}.Release|Any CPU.Build.0 = Release
 		{FB53968C-A8ED-4345-A74F-C7BD09675284}.Release|Mixed Platforms.ActiveCfg = Release
 		{FB53968C-A8ED-4345-A74F-C7BD09675284}.Release|Mixed Platforms.Build.0 = Release
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

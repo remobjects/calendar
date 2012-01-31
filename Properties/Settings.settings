@@ -12,7 +12,7 @@
       <Value Profile="(Default)">password for the LDAP_LoginDomain</Value>
     </Setting>
     <Setting Name="LDAP_CertHash" Type="System.String" Scope="User">
-      <Value Profile="(Default)"></Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LDAP_UserSearchBase" Type="System.String" Scope="User">
       <Value Profile="(Default)">ou=users,dc=yourcompany,dc=com</Value>
@@ -31,6 +31,9 @@
     </Setting>
     <Setting Name="LDAP_GroupFilter" Type="System.String" Scope="User">
       <Value Profile="(Default)">(objectClass=groupOfNames)</Value>
+    </Setting>
+    <Setting Name="DB_ConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">NPGSQL.NET?Server=YOURSERVER;Database=YOURDB;UserID=YOURUSERNAME;Password=YOURPASSWORD;</Value>
     </Setting>
   </Settings>
 </SettingsFile>

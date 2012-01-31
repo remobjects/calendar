@@ -11,7 +11,7 @@ Written using Oxygene for .NET
 * Get and install RemObjects Data Abstract.
 * Get and install PostGreSQL and create a new user & db owned by that user, and import the SQL script given here.
 ** The code isn't tied to PGSQL at all, but we only include a SQL script for this database at the moment, Data Abstract can work with most databases that have a .NET library.
-* Edit app.config and adjust the properties to their right values
+* *Copy app.config to bin/debug* and adjust the properties to their right values
 ** LDAP_LoginDomain: username (full DN) for an ldap user that can find & bind users.
 ** LDAP_Password: password for this user.
 ** LDAP_LdapServer: ldap server address
@@ -22,9 +22,9 @@ Written using Oxygene for .NET
 ** LDAP_GroupFilter: filter for the groups; for example: (objectClass=groupOfNames)
 ** LDAP_UseSSL: set to true if you want to use SSL
 ** Server_Port: port for the server.
-* Then open the RemObjects.Calendar.daConnections and change the connection string to match the details for your PostGreSQL config.
-* Optionally, open the NLog.config file to adjust the logging configuration. 
+** DB_ConnectionString: the connection string for the DB.
 * Build and Run
+* Optionally, modify the NLog.config file to adjust the logging configuration. 
 
 # Using 
 

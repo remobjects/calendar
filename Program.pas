@@ -89,6 +89,7 @@ begin
   lCMGR.EnableAdoConnectionPooling := true;
   lCMGR.PoolingBehavior := RemObjects.SDK.Pooling.PoolBehavior.IgnoreAndReturn;
   lCMGR.Load();
+  lCMGR.ConnectionDefinitions[0].ConnectionString := Settings.Default.DB_ConnectionString;
   var lScheduler := KayakScheduler.Factory.Create(new CalendarScheduler());
   var lRequestHandler := new MainRequestHandler();
   lRequestHandler.Paths.TryAdd('', new RequestConstructor(-> new IndexRequest, Authenticator := CachingAuthenticator.Instance));
