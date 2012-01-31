@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Library Name="CalendarServer" UID="{EBA4557B-CD8A-4434-B34F-1954640CE0A0}" Version="3.0">
+<Services>
+<Service Name="DataService" UID="{18BA72B8-C8B8-4D10-9687-DA0225F36BBA}" Ancestor="DataAbstractService">
+<Interfaces>
+<Interface Name="Default" UID="{63B8EB11-043D-4BA0-944F-7B0285DC6E32}">
+<Operations>
+</Operations>
+</Interface>
+</Interfaces>
+</Service>
+</Services>
+<EventSinks>
+</EventSinks>
+<Structs>
+</Structs>
+<Enums>
+</Enums>
+<Arrays>
+</Arrays>
+<Uses>
+<Use Name="DataAbstract4" UID="{E4184974-1BF5-4234-8FE2-C4AF4D502AE8}" Rodl="$(Data Abstract for Delphi)\Source\DataAbstract4.RODL" AbsoluteRodl="C:\Program Files (x86)\RemObjects Software\Data Abstract for Delphi\Source\DataAbstract4.RODL">
+</Use>
+</Uses>
+<Exceptions>
+</Exceptions>
+</Library>

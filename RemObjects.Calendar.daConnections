@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Connections>
+	<PoolingEnabled>False</PoolingEnabled>
+	<PoolingBehavior>Wait</PoolingBehavior>
+	<MaxPoolSize>10</MaxPoolSize>
+	<WaitIntervalSeconds>1</WaitIntervalSeconds>
+	<PoolTimeoutSeconds>60</PoolTimeoutSeconds>
+	<Definitions>
+		<Definition>
+			<Name>Connection</Name>
+			<ConnectionString>NPGSQL.NET?Server=YOURSERVER;Database=YOURDB;UserID=YOURUSERNAME;Password=YOURPASSWORD;</ConnectionString>
+			<Default>True</Default>
+			<Description></Description>
+			<ConnectionType>PostgreSQL</ConnectionType>
+		</Definition>
+	</Definitions>
+</Connections>

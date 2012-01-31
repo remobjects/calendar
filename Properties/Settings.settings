@@ -1,0 +1,36 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RemObjects.Calendar.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="LDAP_LoginDomain" Type="System.String" Scope="User">
+      <Value Profile="(Default)">dn for a user that can SEARCH the ldap db</Value>
+    </Setting>
+    <Setting Name="LDAP_LdapServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ldap.yourserver.com</Value>
+    </Setting>
+    <Setting Name="LDAP_Password" Type="System.String" Scope="User">
+      <Value Profile="(Default)">password for the LDAP_LoginDomain</Value>
+    </Setting>
+    <Setting Name="LDAP_CertHash" Type="System.String" Scope="User">
+      <Value Profile="(Default)"></Value>
+    </Setting>
+    <Setting Name="LDAP_UserSearchBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ou=users,dc=yourcompany,dc=com</Value>
+    </Setting>
+    <Setting Name="LDAP_UseSSL" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Server_Port" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2222</Value>
+    </Setting>
+    <Setting Name="LDAP_GroupSearchBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ou=groups,dc=yourcompany,dc=com</Value>
+    </Setting>
+    <Setting Name="LDAP_UserFilter" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(objectClass=inetOrgPerson)</Value>
+    </Setting>
+    <Setting Name="LDAP_GroupFilter" Type="System.String" Scope="User">
+      <Value Profile="(Default)">(objectClass=groupOfNames)</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
