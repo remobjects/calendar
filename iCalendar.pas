@@ -69,6 +69,7 @@ begin
   result.Description := aCalendar.Description;
   result.Priority := aCalendar.Priority;
   result.Summary := aCalendar.Summary;
+  result.UID := aCalendar.Uid;
   result.RecurrenceID := if  aCalendar.RecurID = nil then nil else new iCalDateTime(DateTime(aCalendar.RecurID));
   var lItems := rda.Execute([rda.GetTable<Alarms>().Where(a->a.EventID = aCalendar.ID), rda.GetTable<Recurrences>().Where(a->a.EventID = aCalendar.ID)]);
 
@@ -151,6 +152,8 @@ begin
   result.Description := aData.Description;
   result.Priority := aData.Priority;
   result.Summary := aData.Summary;
+  result.Uid := aData.UID
+  ;
   result.RecurID := if aData.RecurrenceID = nil then nil else aData.RecurrenceID.UTC;
 
   if aData.Alarms.Count= 0 then 

@@ -744,7 +744,7 @@
 			<DeleteCommandName></DeleteCommandName>
 			<Description></Description>
 			<DynamicWhereXML><![CDATA[]]></DynamicWhereXML>
-			<Fields Type="TDAFieldCollection" IsObject="true" IsCollection="true" Count="21" ItemClass="TDAField">
+			<Fields Type="TDAFieldCollection" IsObject="true" IsCollection="true" Count="22" ItemClass="TDAField">
 				<Item0>
 					<Alignment>taLeftJustify</Alignment>
 					<BlobType>dabtUnknown</BlobType>
@@ -1438,6 +1438,39 @@
 					<Size>40</Size>
 					<Visible>True</Visible>
 				</Item20>
+				<Item21>
+					<Alignment>taLeftJustify</Alignment>
+					<BlobType>dabtUnknown</BlobType>
+					<BusinessClassID></BusinessClassID>
+					<Calculated>False</Calculated>
+					<CustomAttributes Type="TStrings" IsObject="true"></CustomAttributes>
+					<DataType>datWideMemo</DataType>
+					<DefaultValue></DefaultValue>
+					<Description></Description>
+					<DictionaryEntry></DictionaryEntry>
+					<DisplayFormat></DisplayFormat>
+					<DisplayWidth>0</DisplayWidth>
+					<EditFormat></EditFormat>
+					<EditMask></EditMask>
+					<Expression></Expression>
+					<GeneratorName></GeneratorName>
+					<InPrimaryKey>False</InPrimaryKey>
+					<KeyFields></KeyFields>
+					<LogChanges>True</LogChanges>
+					<Lookup>False</Lookup>
+					<LookupCache>False</LookupCache>
+					<LookupKeyFields></LookupKeyFields>
+					<LookupResultField></LookupResultField>
+					<LookupSource Type="TDataSource" IsObject="true" IsNull="true"></LookupSource>
+					<Name>Uid</Name>
+					<ReadOnly>False</ReadOnly>
+					<RegExpression></RegExpression>
+					<Required>False</Required>
+					<ServerAutoRefresh>False</ServerAutoRefresh>
+					<ServerCalculated>False</ServerCalculated>
+					<Size>0</Size>
+					<Visible>True</Visible>
+				</Item21>
 			</Fields>
 			<InsertCommandName></InsertCommandName>
 			<IsPublic>True</IsPublic>
@@ -1446,7 +1479,7 @@
 			<ReadOnly>False</ReadOnly>
 			<Statements Type="TDAStatementCollection" IsObject="true" IsCollection="true" Count="1" ItemClass="TDAStatement">
 				<Item0>
-					<ColumnMappings Type="TDAColumnMappingCollection" IsObject="true" IsCollection="true" Count="21" ItemClass="TDAColumnMapping">
+					<ColumnMappings Type="TDAColumnMappingCollection" IsObject="true" IsCollection="true" Count="22" ItemClass="TDAColumnMapping">
 						<Item0>
 							<DatasetField>ID</DatasetField>
 							<TableField>ID</TableField>
@@ -1531,6 +1564,10 @@
 							<DatasetField>ETag</DatasetField>
 							<TableField>ETag</TableField>
 						</Item20>
+						<Item21>
+							<DatasetField>Uid</DatasetField>
+							<TableField>Uid</TableField>
+						</Item21>
 					</ColumnMappings>
 					<Connection></Connection>
 					<ConnectionType>PostgreSQL</ConnectionType>

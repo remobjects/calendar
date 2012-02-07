@@ -146,7 +146,8 @@ CREATE TABLE "Events" (
     "RecurID" timestamp without time zone,
     "AllDay" boolean DEFAULT false NOT NULL,
     "TimeZoneInfo" text,
-    "ETag" character varying(40)
+    "ETag" character varying(40),
+	"Uid" text
 );
 
 
