@@ -57,7 +57,7 @@ type
     event Report: Action<DavController, ReportRequest>;
     event PropPatch: Action<DavController, ReportRequest>;
   end;
-  DavDepth = (Zero, One, Infinity);
+  DavDepth = public (Zero, One, Infinity);
 
   ReportRequest = public class(DavRequest)
   private

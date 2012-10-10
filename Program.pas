@@ -17,7 +17,7 @@ uses
 type
   ConsoleApp = class
   public
-    class var Logger: Logger  = LogManager.GetLogger('Kayak'); readonly;
+    class var Logger: Logger  := LogManager.GetLogger('Kayak'); readonly;
     class method Main(args: array of String);
   end;
 
