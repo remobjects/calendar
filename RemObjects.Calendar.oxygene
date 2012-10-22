@@ -28,13 +28,11 @@
     <GenerateMDB>True</GenerateMDB>
     <CaptureConsoleOutput>False</CaptureConsoleOutput>
     <StartMode>Project</StartMode>
-    <CpuType>anycpu</CpuType>
+    <CpuType>x86</CpuType>
     <RuntimeVersion>v25</RuntimeVersion>
     <XmlDoc>False</XmlDoc>
     <XmlDocWarningLevel>WarningOnPublicMembers</XmlDocWarningLevel>
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
-    <SuppressWarnings />
-    <FutureHelperClassName />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
@@ -60,17 +58,16 @@
     <Reference Include="DDay.iCal">
       <HintPath>Lib\DDay.iCal.dll</HintPath>
     </Reference>
-    <Reference Include="Kayak">
-      <HintPath>Lib\Kayak.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="NLog">
       <HintPath>Lib\NLog.dll</HintPath>
     </Reference>
     <Reference Include="RemObjects.DataAbstract">
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Data Abstract for .NET\Bin\RemObjects.DataAbstract.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RemObjects.DataAbstract.Linq">
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Data Abstract for .NET\Bin\RemObjects.DataAbstract.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RemObjects.DataAbstract.Server">
@@ -78,18 +75,23 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="RemObjects.InternetPack">
-      <HintPath>C:\Program Files (x86)\RemObjects Software\RemObjects SDK for .NET\Bin\RemObjects.InternetPack.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Data Abstract for .NET\Bin\RemObjects.InternetPack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RemObjects.InternetPack.Libuv">
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Internet Pack for .NET\Bin\RemObjects.InternetPack.LibUV.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RemObjects.SDK">
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Data Abstract for .NET\Bin\RemObjects.SDK.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RemObjects.SDK.Server">
-      <HintPath>C:\Program Files (x86)\RemObjects Software\RemObjects SDK for .NET\Bin\RemObjects.SDK.Server.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Data Abstract for .NET\Bin\RemObjects.SDK.Server.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RemObjects.SDK.ZLib">
-      <HintPath>C:\Program Files (x86)\RemObjects Software\RemObjects SDK for .NET\Bin\RemObjects.SDK.ZLib.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\RemObjects Software\Data Abstract for .NET\Bin\RemObjects.SDK.ZLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -166,10 +168,10 @@
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Oxygene\RemObjects.Oxygene.targets" />
   <PropertyGroup>
     <PreBuildEvent />
+    <PreBuildEvent />
+    <PreBuildEvent />
+    <PreBuildEvent />
     <PostBuildEvent />
-    <PreBuildEvent />
-    <PreBuildEvent />
-    <PreBuildEvent />
     <PostBuildEvent />
     <PostBuildEvent />
     <PostBuildEvent />

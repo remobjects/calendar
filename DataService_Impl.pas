@@ -31,6 +31,7 @@ type
   DataService = public class(RemObjects.DataAbstract.Server.DataAbstractService, IDataService)
   private 
     method InitializeComponent;
+    method DataService_AfterSqlGeneration(sender: RemObjects.DataAbstract.Server.BusinessProcessor; e: RemObjects.DataAbstract.Server.SqlGenerationEventArgs);
     var components: System.ComponentModel.Container := nil;
   protected 
     method Dispose(aDisposing: System.Boolean); override;
@@ -56,6 +57,7 @@ begin
   self.AcquireConnection := true;
   self.ConnectionName := 'Connection';
   self.ServiceSchemaName := 'Calendar.daSchema';
+  self.AfterSqlGeneration += new RemObjects.DataAbstract.Server.SqlGenerationEventHandler(@self.DataService_AfterSqlGeneration);
 end;
 
 method DataService.Dispose(aDisposing: System.Boolean);
@@ -67,5 +69,12 @@ begin
   end;
   inherited Dispose(aDisposing);
 end;
+
+method DataService.DataService_AfterSqlGeneration(sender: RemObjects.DataAbstract.Server.BusinessProcessor; e: RemObjects.DataAbstract.Server.SqlGenerationEventArgs);
+begin
+  ConsoleApp.Logger.Debug('SQL: '+e.SQLStatement);
+end;
+
+
 
 end.

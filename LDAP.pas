@@ -27,7 +27,7 @@ type
   private
     fCache: ConcurrentDictionary<Tuple<string,String>, Tuple<DateTime, MembershipInfo>> := new ConcurrentDictionary<Tuple<string,String>, Tuple<DateTime, MembershipInfo>>; 
   public
-    property CacheTimeout: TimeSpan := new TimeSpan(0,1,0);
+    property CacheTimeout: TimeSpan := new TimeSpan(0,10,0);
     method Login(aUser, aPassword: String; aContinue: Action<MembershipInfo>);
 
     class var Instance: CachingAuthenticator := new CachingAuthenticator;

@@ -9,16 +9,14 @@ uses
   System.Linq,
   System.Text, 
   System.Xml.Linq, 
-  Kayak.Http;
+  RemObjects.InternetPack.Http;
 
 type
-  DavController = public abstract class(RequestHandler, IHttpResponseDelegate, IDisposable)
+  DavController = public abstract class(RequestHandler, IDisposable)
   private
-    fIntResponse: IHttpResponseDelegate;
     fController: CalendarController;
     fRootPath: string;
 
-    method OnResponse(head: HttpResponseHead; body: Kayak.IDataProducer);
   protected
     method ParsePropPatch(aDepth: DavDepth; aDav: array of String);
     method ParsePropFind(adepth: DavDepth; aDav: array of string);
@@ -32,10 +30,10 @@ type
     constructor(aPath: string);
     property RootPath: string read fRootPath;
     method Dispose;
+    method Done; override;
     property Controller: CalendarController read fController;
     property Calendar: Calendars;
     property Document: string;
-    property Response: IHttpResponseDelegate read self write fIntResponse; override;
     //property Calendar: 
     method DoRequest; override;
     method SendPropFindResponse(aResp: DavResponses);
@@ -155,20 +153,24 @@ end;
 
 method DavController.DoRequest;
 begin
-  consoleapp.Logger.Debug('0 Processing '+Request.Method+' for calendar '+coalesce(Calendar:Name, '{root}'));
+  consoleapp.Logger.Debug('0 Processing '+Request.Header.RequestType+' for calendar '+coalesce(Calendar:Name, '{root}'));
   var lDav: array of String := nil;
   var lDepth: DavDepth := DavDepth.Infinity;
-  var lHeader: string;
-  if request.Headers.TryGetValue('Depth', out lHeader) then begin
+  var lHeader: string := request.Header.GetHeaderValue('Depth');
+
+  if lHeader <> nil then begin
     if lHeader = '0' then lDepth := DavDepth.Zero else
     if lHeader = '1' then lDepth := DavDepth.One;
   end;
-  if request.Headers.TryGetValue('DAV', out lHeader) then begin
+
+  lHeader := request.Header.GetHeaderValue('DAV');
+  if lHeader <> nil then begin
     lDav := lHeader.Split([','], StringSplitOptions.RemoveEmptyEntries).Select(a-> a.Trim()).ToArray;
   end;
   fController := new CalendarController(self.Auth.Username, Auth.Membership);
-  Headers.Headers.Add('dav', '1, 2, calendar-access, calendar-schedule, calendar-auto-schedule, calendar-query-extended, calendarserver-principal-property-search');
+  Response.Header.SetHeaderValue('dav', '1, 2, calendar-access, calendar-schedule, calendar-auto-schedule, calendar-query-extended, calendarserver-principal-property-search');
 
+  
   if Path <> nil then begin
     Calendar := fController.Calendars.FirstOrDefault(a->a.Name = Path.Value);
     if Calendar = nil then begin
@@ -185,8 +187,8 @@ begin
     end;
   end;
 
-  consoleapp.Logger.Debug('Processing '+Request.Method+' for calendar '+coalesce(Calendar:Name, '{root}'));
-  case Request.Method of
+  consoleapp.Logger.Debug('Processing '+Request.Header.RequestType+' for calendar '+coalesce(Calendar:Name, '{root}'));
+  case Request.Header.RequestType of
     'PROPFIND': ParsePropFind(lDepth, lDav);
     'OPTIONS': ParseOptions(lDepth, lDav);
     'PUT': ParsePut(lDepth, lDav);
@@ -206,32 +208,28 @@ end;
 
 method DavController.ParsePropFind(adepth: DavDepth; aDav: array of string);
 begin
-  Body.Connect(new BufferedConsumer(method(arg: BufferedConsumer) begin
-    if arg.Error <> nil then SendInternalError else begin
-      try
-        var lDoc := XDocument.Load(arg.Data);
-         ConsoleApp.Logger.Debug('Logging propfind request: '+ldoc.ToString());
-        if lDoc.Root:Name <> XName.Get('{DAV:}propfind') then raise new ArgumentException('Expected {DAV:}propfind in the root!');
-        var lRoot := lDoc.Root.Elements().FirstOrDefault(a->a.Name.Namespace = 'DAV:');
-        var lItem := new PropFindRequest();
-        lItem.Dav := aDav;
-        lItem.Depth := aDepth;
-        if lRoot = nil then lItem.Mode := PropFindMode.AllProp else 
-        if lRoot.Name.LocalName  = 'allprop' then  lItem.Mode := PropFindMode.AllProp else
-        if lRoot.Name.LocalName  = 'propname' then  lItem.Mode := PropFindMode.PropName else 
-        if lRoot.Name.LocalName = 'prop' then begin
-          lItem.Properties := lRoot.Elements.ToArray;
-        end else raise new ArgumentException('allprop, propname or prop expected');
+  try
+    var lDoc := XDocument.Load(new MemoryStream(State.CurrentRequest.ContentBytes));
+      ConsoleApp.Logger.Debug('Logging propfind request: '+ldoc.ToString());
+    if lDoc.Root:Name <> XName.Get('{DAV:}propfind') then raise new ArgumentException('Expected {DAV:}propfind in the root!');
+    var lRoot := lDoc.Root.Elements().FirstOrDefault(a->a.Name.Namespace = 'DAV:');
+    var lItem := new PropFindRequest();
+    lItem.Dav := aDav;
+    lItem.Depth := aDepth;
+    if lRoot = nil then lItem.Mode := PropFindMode.AllProp else 
+    if lRoot.Name.LocalName  = 'allprop' then  lItem.Mode := PropFindMode.AllProp else
+    if lRoot.Name.LocalName  = 'propname' then  lItem.Mode := PropFindMode.PropName else 
+    if lRoot.Name.LocalName = 'prop' then begin
+      lItem.Properties := lRoot.Elements.ToArray;
+    end else raise new ArgumentException('allprop, propname or prop expected');
 
-        var lCB := PropFind;
-        if lCB = nil then Send404 else 
-          lCB(self, lItem);
-      except
-        on e: Exception do
-        SendInternalError(e.Message);
-      end;
-    end;
-  end));
+    var lCB := PropFind;
+    if lCB = nil then Send404 else 
+      lCB(self, lItem);
+  except
+    on e: Exception do
+    SendInternalError(e.Message);
+  end;
 end;
 
 method DavController.SendPropFindResponse(aResp: DavResponses);
@@ -241,21 +239,23 @@ begin
   //CleanXmlns(lel);
   lEl.Save(lMS, SaveOptions.OmitDuplicateNamespaces or SAveOptions.DisableFormatting);
 
-  Headers.Status := "207 Multi-Status";
-  headers.Headers.Add('Content-Type', 'text/xml; charset="utf-8"');
+  Response.code := 207;
+  response.ResponseText:= "Multi-Status";
+  Response.Header.SetHeaderValue('Content-Type', 'text/xml; charset="utf-8"');
   var lStripHeader := (lMS.Length > 3) and (lMS.GetBuffer()[0] = $ef);
-  headers.Headers.Add('Content-Length', (if lStripHeader then lMS.Length - 3 else lMS.Length).ToString);
+  Response.Header.SetHeaderValue('Content-Length', (if lStripHeader then lMS.Length - 3 else lMS.Length).ToString);
 
-  headers.Headers.Add('pragma', 'no-cache');
-  headers.Headers.Add('cache-control', 'no-cache');
+  Response.Header.SetHeaderValue('pragma', 'no-cache');
+  Response.Header.SetHeaderValue('cache-control', 'no-cache');
 
   var lBody := 
   if lStripHeader then // mono hack; skip utf8 header
-  new BufferedProducer(new ARraySegment<Byte>(lMS.GetBuffer, 3, lMS.Length -3)) else
-  new BufferedProducer(new ARraySegment<Byte>(lMS.GetBuffer, 0, lMS.Length));
+    new ARraySegment<Byte>(lMS.GetBuffer, 3, lMS.Length -3) else
+    new ARraySegment<Byte>(lMS.GetBuffer, 0, lMS.Length);
 
    ConsoleApp.Logger.Debug('Logging propfind response: '+aResp.ToXElement().ToString());
-  response.OnResponse(headers, lBody);
+  state.CurrentResponse.ContentStream := new MemoryStream(lBody.Array, lBody.Offset, lBody.Count);
+  Done;
 
 end;
 
@@ -269,36 +269,37 @@ end;
 
 method DavController.SendOptionsResponse(aDavAllow: array of String);
 begin
-  headers.Headers.Add('Content-Type', 'text/plain; charset="utf-8"');
-  headers.Headers.Add('allow', String.Join(', ', aDavAllow));
-  headers.Headers.Add('Content-Length','0');
-
-  response.OnResponse(headers, nil); 
+  Response.Header.SetHeaderValue('Content-Type', 'text/plain; charset="utf-8"');
+  Response.Header.SetHeaderValue('allow', String.Join(', ', aDavAllow));
+  Response.Header.SetHeaderValue('Content-Length','0');
+  Response.ContentBytes := [];
+  Done;
 end;
 
 method DavController.ParsePut(adepth: DavDepth; aDav: array of string);
 begin
   var lAct := Put;
   if lACt = nil then Send404 else begin
-    Body.Connect(new BufferedConsumer(method(arg: BufferedConsumer) begin
-      if arg.Error <> nil then SendInternalError(arg.Error.ToString) else begin
-        arg.Data.Position := 0;
-        lACt(self, arg.Data);
-      end;
-    end));
+    lACt(self, new MemoryStream(State.CurrentRequest.ContentBytes));
   end;
 end;
 
 method DavController.SendPutResponse(aUpdated: Boolean; aTag: string);
 begin
-  var lSTatus: string := if aUpdated then '204 No Content' else '201 Created';
-  headers.Status := lStatus;
-  headers.Headers.Add('Content-Type', 'text/plain; charset="utf-8"');
-  headers.Headers.Add('Content-Length','0');
+  if aUpdated then begin
+    response.Code := 204;
+    response.ResponseText := 'No Content';
+  end else begin 
+    response.Code := 201;
+    response.ResponseText := 'Created';
+  end;
+  Response.Header.SetHeaderValue('Content-Type', 'text/plain; charset="utf-8"');
+  Response.Header.SetHeaderValue('Content-Length','0');
   if aTag <> nil then 
-    headers.Headers.Add('etag', '"'+aTag+'"');
+    Response.Header.SetHeaderValue('etag', '"'+aTag+'"');
 
-  response.OnResponse(headers, nil);
+  Response.ContentBytes := [];
+  Done;
 end;
 
 method DavController.ParseDelete(aDepth: DavDepth; aDav: array of string);
@@ -311,18 +312,14 @@ end;
 
 method DavController.SendDeleteResponse(aStatus: string);
 begin
-  self.Headers.Status := aStatus;
-  headers.Headers.Add('Content-Type', 'text/plain; charset="utf-8"');
-  headers.Headers.Add('Content-Length','0');
+  STate.CurrentResponse.Code := Int32.Parse(aStatus.Substring(0, aStatus.IndexOf(' ')));
+  state.CurrentResponse.ResponseText := aStatus.Substring(aStatus.IndexOf(' ')+1);
+  State.CurrentResponse.Header.ContentType := 'text/plain; charset="utf-8"';
+  State.CurrentRequest.ContentBytes := [];
 
-  response.OnResponse(headers, nil);
+  Done;
 end;
 
-method DavController.OnResponse(head: HttpResponseHead; body: Kayak.IDataProducer);
-begin
-  fIntResponse.OnResponse(head, body);
-  Dispose;
-end;
 
 constructor DavController(aPath: string);
 begin
@@ -336,51 +333,42 @@ end;
 
 method DavController.ParseReport(adepth: DavDepth; aDav: array of string);
 begin
-  Body.Connect(new BufferedConsumer(method(arg: BufferedConsumer) begin
-    if arg.Error <> nil then SendInternalError else begin
-      try
-        var lDoc := XDocument.Load(arg.Data);
-        ConsoleApp.Logger.Debug('Logging REPORT request: '+ldoc.ToString());
+  try
+    var lDoc := XDocument.Load(new MemoryStream(state.CurrentRequest.ContentBytes));
+    ConsoleApp.Logger.Debug('Logging REPORT request: '+ldoc.ToString());
 
-        var lItem := new ReportRequest;
-        lItem.Dav := aDav;
-        lItem.Depth := adepth;
-        lItem.RootRequest := lDoc.Root;
+    var lItem := new ReportRequest;
+    lItem.Dav := aDav;
+    lItem.Depth := adepth;
+    lItem.RootRequest := lDoc.Root;
         
-        var lCB := Report;
-        if lCB = nil then Send404 else 
-          lCB(self, lItem);
-      except
-        on e: Exception do
-        SendInternalError(e.ToString());
-      end;
-    end;
-  end));
+    var lCB := Report;
+    if lCB = nil then Send404 else 
+      lCB(self, lItem);
+  except
+    on e: Exception do
+    SendInternalError(e.ToString());
+  end;
 end;
 
 method DavController.ParsePropPatch(aDepth: DavDepth; aDav: array of String);
 begin
-    Body.Connect(new BufferedConsumer(method(arg: BufferedConsumer) begin
-    if arg.Error <> nil then SendInternalError else begin
-      try
-        var lDoc := XDocument.Load(arg.Data);
-        ConsoleApp.Logger.Debug('Logging PROPPATCH request: '+ldoc.ToString());
+  try
+    var lDoc := XDocument.Load(new MemoryStream(request.ContentBytes));
+    ConsoleApp.Logger.Debug('Logging PROPPATCH request: '+ldoc.ToString());
 
-        var lItem := new ReportRequest;
-        lItem.Dav := aDav;
-        lItem.Depth := adepth;
-        lItem.RootRequest := lDoc.Root;
+    var lItem := new ReportRequest;
+    lItem.Dav := aDav;
+    lItem.Depth := adepth;
+    lItem.RootRequest := lDoc.Root;
         
-        var lCB := PropPatch;
-        if lCB = nil then SendForbidden else 
-          lCB(self, lItem);
-      except
-        on e: Exception do
-        SendInternalError(e.Message);
-      end;
-    end;
-  end));
-
+    var lCB := PropPatch;
+    if lCB = nil then SendForbidden else 
+      lCB(self, lItem);
+  except
+    on e: Exception do
+    SendInternalError(e.Message);
+  end;
 end;
 
 method DavController.ParseMove(aDepth: DavDepth; aDav: array of string);
@@ -393,15 +381,29 @@ end;
 
 method DavController.SendMoveResponse(aNew: Boolean; aLoc, eTag: string);
 begin
-  var lSTatus: string := if not aNew then '204 No Content' else '201 Created';
-  headers.Status := lStatus;
-  headers.Headers.Add('Content-Type', 'text/plain; charset="utf-8"');
-  headers.Headers.Add('Content-Length','0');
-  Headers.Headers.Add('Location', aLoc);
-  if eTag <> nil then 
-    headers.Headers.Add('etag', '"'+eTag+'"');
+  if not aNew then begin
+    response .Code := 204;
+    response.ResponseText := 'No Content';
+  end else begin
+      response .Code := 201;
+    response.ResponseText := 'Created';
 
-  response.OnResponse(headers, nil);
+  end;
+  Response.Header.SetHeaderValue('Content-Type', 'text/plain; charset="utf-8"');
+  Response.Header.SetHeaderValue('Content-Length','0');
+  Response.Header.SetHeaderValue('Location', aLoc);
+  if eTag <> nil then 
+    Response.Header.SetHeaderValue('etag', '"'+eTag+'"');
+
+  Response.ContentBytes := [];
+  Done;
+
+end;
+
+method DavController.Done;
+begin
+  inherited Done;
+  Dispose;
 end;
 
 end.

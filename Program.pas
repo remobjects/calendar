@@ -9,8 +9,6 @@ uses
   System.Linq, 
   System.Net,
   DDay.iCal, 
-  Kayak,
-  Kayak.Http, 
   NLog;
 
 
@@ -21,12 +19,6 @@ type
     class method Main(args: array of String);
   end;
 
-  CalendarScheduler = class(ISchedulerDelegate)
-  private
-  public
-    method OnException(scheduler: IScheduler; e: Exception);
-    method OnStop(scheduler: IScheduler);
-  end;
 
   IndexRequest = class(RequestHandler)
   private
@@ -38,7 +30,7 @@ implementation
 
 method IndexRequest.DoRequest;
 begin
-  if Request.Method not in ['GET', 'HEAD'] then SendMethodNotSupported else begin
+  if Request.Header.RequestType not in ['GET', 'HEAD'] then SendMethodNotSupported else begin
 
     var lCal: string;
     using lCals := new CAlendarController(Auth.Username, Auth.Membership) do
@@ -58,27 +50,13 @@ When using iCalendar, use <a href=""/dav/"">dav/</a> as an url. Thunderbird and 
 
   </body>
 </html>";
-    var headers := new HttpResponseHead(
-        Status := "200 OK",
-        Headers := new Dictionary<string, string>
-    );
-    headers.Headers.Add('Content-Type', 'text/html');
-    headers.Headers.Add('Content-Length', responseBody.Length.ToSTring);
-    var lBody := new BufferedProducer(responseBody);
+  
+    response.Header.ContentType := 'text/html';
+    Response.ContentString := responseBody;
 
-    response.OnResponse(headers, lBody);
+    state.SendResponse;
 
   end;
-end;
-
-method CalendarScheduler.OnException(scheduler: IScheduler; e: Exception);
-begin
-  ConsoleApp.Logger.Info('Exception in server: '+e);
-end;
-
-method CalendarScheduler.OnStop(scheduler: IScheduler);
-begin
-  ConsoleApp.Logger.Info('Stopped server');
 end;
 
 class method ConsoleApp.Main(args: array of String);
@@ -90,14 +68,19 @@ begin
   lCMGR.PoolingBehavior := RemObjects.SDK.Pooling.PoolBehavior.IgnoreAndReturn;
   lCMGR.Load();
   lCMGR.ConnectionDefinitions[0].ConnectionString := Settings.Default.DB_ConnectionString;
-  var lScheduler := KayakScheduler.Factory.Create(new CalendarScheduler());
+  var lServer := new RemObjects.InternetPack.Http.AsyncHttpServer;
+  lServer.BindV6 := false;
+  lServer.BindingV4.Address := IPAddress.Any;
+  lServer.Port := Settings.Default.Server_Port;
+  var lServ := new RemObjects.InternetPack.LibUV.LibUVConnectionFactory();
+  lServer.ConnectionFactory := lServ;
   var lRequestHandler := new MainRequestHandler();
+  lServer.OnHttpRequest += @(lRequestHandler .OnRequest);
   lRequestHandler.Paths.TryAdd('', new RequestConstructor(-> new IndexRequest, Authenticator := CachingAuthenticator.Instance));
   lRequestHandler.Paths.TryAdd('dav', new RequestConstructor(-> new CalDavRequest('/dav/'), Authenticator := CachingAuthenticator.Instance));
-  var lServer := KayakServer.Factory.CreateHttp(lRequestHandler, lScheduler);
-  using lServer.Listen(new IPEndPoint(IPAddress.Any, Settings.Default.Server_Port)) do begin
-    lScheduler.Start();
-  end;
+  lServer.Active := true;
+  
+  while true do System.Threading.Thread.Sleep(1000);
 end;
 
 end.

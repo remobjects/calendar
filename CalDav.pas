@@ -12,7 +12,7 @@ uses
   System.Xml.Linq,
   DDay.iCal,
   DDay.iCal.Serialization.iCalendar,
-  Kayak.Http;
+  RemObjects.InternetPack.Http;
 
 type
   CalDavRequest = public class(DavController)
@@ -59,7 +59,7 @@ begin
       var lItemD := new DavResponse();
       lOutput.Add(lItemD);
       lItemD.Status := 'HTTP/1.1 404 Not Found';
-      lItemD.HREF := [Request.Path];
+      lItemD.HREF := [Request.Header.RequestPath];
     end else begin
       GenerateCalendarDataEntry(aInput, aOwner.Calendar, lOutput, lItem);
     end;
@@ -146,7 +146,7 @@ begin
     end;
   end;
 
-  Send404;
+  //Send404;
 end;
 
 method CalDavRequest.IntOptions(aOwner: DavController);
@@ -163,12 +163,10 @@ begin
       exit;
     end else begin
       var responseBody := iCalendarUtils.ICalendarToString(lItem, Controller.LDA);
-      headers.Status := "200 OK";
-      headers.Headers.Add('Content-Type', 'text/calendar');
-      headers.Headers.Add('Content-Length', responseBody.Length.ToSTring);
-      var lBody := new BufferedProducer(responseBody);
-
-      response.OnResponse(headers, lBody);
+      Response.Header.SetHeaderValue('Content-Type', 'text/calendar');
+      Response.Header.SetHeaderValue('Content-Length', responseBody.Length.ToSTring);
+      response.ContentString := responseBody;
+      Done;
       exit;
     end;
   end;
@@ -182,16 +180,13 @@ begin
 end;
   </body>
 </html>";
-    var headers := new HttpResponseHead(
-        Status := "405 Method Not Allowed",
-        Headers := new Dictionary<string, string>
-    );
-    headers.Headers.Add('Content-Type', 'text/html');
-    headers.Headers.Add('Content-Length', responseBody.Length.ToSTring);
-    var lBody := new BufferedProducer(responseBody);
+  response.Code := 405;
+  Response.ResponseText := 'Method Not Allowed';
+  Response.Header.ContentType := 'text/html';
+  Response.Header.SetHeaderValue('Content-Length', responseBody.Length.ToSTring);
 
-  if aOwner.Request.Method = 'HEAD' then lBody := nil;
-  response.OnResponse(headers, lBody);
+  if aOwner.Request.Header.RequestType = 'HEAD' then response.ContentBytes := [] else Response.ContentString := responseBody;
+  Done;
 end;
 
 method CalDavRequest.GenerateFor(aInput: PropFindRequest; aCalendar: Calendars; aTarget: DavResponses);
@@ -211,6 +206,10 @@ begin
       '{DAV:}owner': lItem.GetPropStatWithStatus('HTTP/1.1 200 OK').Prop.Add(new XElement('{DAV:}owner', new Xelement('{DAV:}href', RootPath+Auth.Username+'/')));
       '{urn:ietf:params:xml:ns:caldav}calendar-user-address-set':
         lItem.GetPropStatWithStatus('HTTP/1.1 200 OK').Prop.Add(new XElement('{urn:ietf:params:xml:ns:caldav}calendar-user-address-set', new XElement('{DAV:}href', RootPath+if aCalendar = nil then '' else calendar.Name+'/')));
+      '{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL':
+        lItem.GetPropStatWithStatus('HTTP/1.1 200 OK').Prop.Add(new XElement('{urn:ietf:params:xml:ns:caldav}schedule-inbox-URL', new XElement('{DAV:}href', RootPath+if aCalendar = nil then '' else calendar.Name+'/')));
+      '{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL':
+        lItem.GetPropStatWithStatus('HTTP/1.1 200 OK').Prop.Add(new XElement('{urn:ietf:params:xml:ns:caldav}schedule-outbox-URL', new XElement('{DAV:}href', RootPath+if aCalendar = nil then '' else calendar.Name+'/')));
       '{urn:ietf:params:xml:ns:caldav}calendar-home-set':
         lItem.GetPropStatWithStatus('HTTP/1.1 200 OK').Prop.Add(new XElement('{urn:ietf:params:xml:ns:caldav}calendar-home-set', new XElement('{DAV:}href', RootPath+if aCalendar = nil then '' else calendar.Name+'/')));
       //'{urn:ietf:params:xml:ns:caldav}calendar-user-address-set'
@@ -418,8 +417,7 @@ begin
   if (aOwner.Calendar <> nil) and(aOwner.Document <> nil) then begin
     var lItem := aOwner.Controller.Events(aOwner.Calendar).FirstOrDefault(a->a.ICSName = aOwner.Document);
     var lDest: String := nil;
-    var lPrepend: string := '';
-    aowner.Request.Headers.TryGetValue('Destination', out lDest) ;
+    var lPrepend: string := aOwner.Request.Header.GetHeaderValue('Destination') ;
     if (lItem = nil) or STring.IsNullOrEmpty(lDest) then begin
       Send404();
       exit;
